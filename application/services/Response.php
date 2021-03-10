@@ -27,7 +27,7 @@ class Response
         $params = [];
         if (is_array($data)) {
             $params['data'] = $data;
-        } 
+        }
         if (is_bool($status)) {
             $params['status'] = $status;
         }

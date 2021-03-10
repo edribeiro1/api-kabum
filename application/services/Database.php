@@ -6,12 +6,14 @@ class Database
     private $where = "";
     private $table = false;
 
-    function __construct() {
+    public function __construct()
+    {
         $this->connection = mysqli_connect(
-            'localhost', 
-            'admin', 
-            'k73ndsaB4n4m', 
-            'kabum'
+            $_ENV['MYSQL_HOST'],
+            $_ENV['MYSQL_USER'],
+            $_ENV['MYSQL_PASSWORD'],
+            $_ENV['MYSQL_DATABASE'],
+            $_ENV['MYSQL_PORT']
         );
     }
 
@@ -45,17 +47,14 @@ class Database
 
     public function insert()
     {
-        
     }
 
     public function delete()
     {
-        
     }
 
     public function update()
     {
-        
     }
 
     private function cleanAfterOperation()

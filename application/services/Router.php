@@ -1,7 +1,5 @@
 <?php
 
-require_once('Response.php');
-
 class Router
 {
     public static function resolve()
@@ -10,19 +8,31 @@ class Router
         if (count($uri) && !is_numeric($uri[0])) {
             $param = null;
             $pathModule = "";
+            $className = null;
+            $method = "index";
 
             if (is_numeric($uri[count($uri)-1])) {
                 $param = (int)$uri[count($uri)-1];
                 unset($uri[count($uri)-1]);
             }
 
-            $uri[count($uri)-1] = ucfirst($uri[count($uri)-1]);
-            $pathModule = implode($uri, '/');
-
-            var_dump($pathModule);
-            exit();
-            if (file_exists("../controllers/$pathModule.php")) {
-                require_once("../controllers/$pathModule.php");
+            foreach ($uri as $directory) {
+                if (is_null($className)) {
+                    if (file_exists(APPPATH.'controllers/' . $pathModule . ucfirst($directory) . '.php')) {
+                        $className = ucfirst($directory);
+                        $pathModule .= "$className.php";
+                    } else {
+                        $pathModule .= "$directory/";
+                    }
+                } else {
+                    $method = $directory;
+                }
+            }
+           
+            if ($className) {
+                require_once(APPPATH."controllers/$pathModule");
+                $class = new $className();
+                $class->$method($param);
             } else {
                 Response::send(404, false, 'Module not found');
             }
@@ -37,12 +47,6 @@ class Router
             ]
             );
         }
-        // if (count($uri)) {
-        // }
-
-        // $controller = $uri[0];
-        // $action = $uri[count($uri)-1];
-        // var_dump($action);
     }
 
 

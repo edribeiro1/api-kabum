@@ -1,7 +1,6 @@
 <?php
 
-require_once('application/config/Config.php');
-require_once("application/services/Router.php");
+require_once('application/config/Autoload.php');
 
 Router::resolve();
     
