@@ -1,11 +1,15 @@
 <?php
 
-class Token extends Api_controller
+use application\models\Auth as model;
+use application\core\Api;
+
+
+class Auth extends Api
 {
     public function __construct()
     {
         parent::__construct();
-        var_dump("Construtor");
+        $this->model = new model();
     }
 
     public function index()

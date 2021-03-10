@@ -1,5 +1,7 @@
 <?php
 
+namespace application\services;
+
 class Router
 {
     public static function resolve()
@@ -31,6 +33,7 @@ class Router
            
             if ($className) {
                 require_once(APPPATH."controllers/$pathModule");
+
                 $class = new $className();
                 $class->$method($param);
             } else {

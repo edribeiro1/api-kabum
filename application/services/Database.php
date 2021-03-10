@@ -1,5 +1,7 @@
 <?php
 
+namespace application\services;
+
 class Database
 {
     private $columns = '*';
@@ -8,13 +10,13 @@ class Database
 
     public function __construct()
     {
-        $this->connection = mysqli_connect(
-            $_ENV['MYSQL_HOST'],
-            $_ENV['MYSQL_USER'],
-            $_ENV['MYSQL_PASSWORD'],
-            $_ENV['MYSQL_DATABASE'],
-            $_ENV['MYSQL_PORT']
-        );
+        // $this->connection = mysqli_connect(
+        //     $_ENV['MYSQL_HOST'],
+        //     $_ENV['MYSQL_USER'],
+        //     $_ENV['MYSQL_PASSWORD'],
+        //     $_ENV['MYSQL_DATABASE'],
+        //     $_ENV['MYSQL_PORT']
+        // );
     }
 
     public function select($columns)

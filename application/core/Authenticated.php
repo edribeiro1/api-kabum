@@ -1,6 +1,6 @@
 <?php
 
-class Api_controller
+class Authenticated extends Api
 {
     public function __construct()
     {
