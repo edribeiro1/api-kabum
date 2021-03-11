@@ -1,24 +1,26 @@
 <?php
 
-use application\models\Auth as model;
-use application\core\Api;
+use application\models\Auth as Model;
 
-
-class Auth extends Api
+class Auth
 {
-    public function __construct()
-    {
-        parent::__construct();
-        $this->model = new model();
-    }
-
+  
     public function index()
     {
-        var_dump("index");
-    }
+        if (method() == 'POST') {
+            $params = getContents();
+            if (isset($params['username']) && isset($params['password'])) {
+                $data = Model::token($params);
 
-    public function metodo()
-    {
-        var_dump("metodo");
+                if ($data) {
+                    send(200, true, 'Token successfully generated', $data);
+                }
+
+                send(400, false, 'Error generate token');
+            }
+            send(400, false, 'Invalid params');
+        }
+
+        send(400, false, 'Invalid method: '. method());
     }
 }

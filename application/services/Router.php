@@ -4,8 +4,12 @@ namespace application\services;
 
 class Router
 {
-    public static function resolve()
+    public static function initialize()
     {
+        if (method() == 'OPTIONS') {
+            send();
+        }
+        
         $uri = Router::uri();
         if (count($uri) && !is_numeric($uri[0])) {
             $param = null;
@@ -37,10 +41,10 @@ class Router
                 $class = new $className();
                 $class->$method($param);
             } else {
-                Response::send(404, false, 'Module not found');
+                send(404, false, 'Module not found');
             }
         } else {
-            Response::send(
+            send(
                 200,
                 true,
                 'Api processo seletivo KaBuM!',

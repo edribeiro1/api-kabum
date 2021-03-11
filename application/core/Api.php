@@ -3,16 +3,17 @@
 namespace application\core;
 
 use application\services\Database;
+use application\helpers\Utils;
+use application\helpers\Response;
 
-class Api
-{
-    public function __construct()
-    {
-        if (strtolower($_SERVER['REQUEST_METHOD']) == 'options') {
-            Response::send();
+abstract class Api {
+
+    protected static $dbInstance = null;
+
+    function __construct() {
+        if (!self::$dbInstance) {
+            self::$dbInstance = new Database();
         }
-
-        $this->db = new Database();
+        $this->db = self::$dbInstance;
     }
-    
 }

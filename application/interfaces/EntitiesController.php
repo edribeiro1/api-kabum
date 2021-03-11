@@ -2,6 +2,6 @@
 
 namespace application\interfaces;
 
-interface Entities {
+interface EntitiesController {
     public function index($id);
 }

@@ -1,9 +1,17 @@
 <?php
 
-class Authenticated extends Api
+namespace application\core;
+
+use application\core\Api;
+use application\models\Auth;
+
+
+abstract class Authenticated extends Api 
 {
     public function __construct()
     {
-        $this->db = new Database();
+        parent::__construct();
+        $tokenData = Auth::validate();
+        $this->user_id = $tokenData['user_id'];
     }
 }
