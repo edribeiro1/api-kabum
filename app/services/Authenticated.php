@@ -1,9 +1,9 @@
 <?php
 
-namespace application\core;
+namespace app\core;
 
-use application\core\Api;
-use application\models\Auth;
+use app\core\Api;
+use app\models\Auth;
 
 
 abstract class Authenticated extends Api 

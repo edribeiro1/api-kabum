@@ -1,13 +1,12 @@
 <?php
 
-namespace application\core;
+namespace app\storage;
 
-use application\services\Database;
-use application\helpers\Utils;
-use application\helpers\Response;
+use app\providers\Database;
 
-abstract class Api {
+abstract class DatabaseStorage{
 
+    //static instance to not instantiate new bank connections when it is necessary to use the database
     protected static $dbInstance = null;
 
     function __construct() {

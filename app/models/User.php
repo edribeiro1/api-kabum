@@ -1,8 +1,8 @@
 <?php
 
-namespace application\models;
+namespace app\models;
 
-use application\core\Api;
+use app\core\Api;
 
 class User extends Api
 {

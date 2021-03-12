@@ -1,6 +1,8 @@
 <?php
 
-namespace application\services;
+namespace app\config;
+
+use app\middlewares\Authentication;
 
 class Router
 {
@@ -38,7 +40,17 @@ class Router
             if ($className) {
                 require_once(APPPATH."controllers/$pathModule");
 
+                $authData = false;
+                if ($className != 'Auth') {
+                    $authData = Authentication::authenticate();
+                }
+
                 $class = new $className();
+
+                if ($authData) {
+                    $class->authData = $authData;
+                }
+
                 $class->$method($param);
             } else {
                 send(404, false, 'Module not found');

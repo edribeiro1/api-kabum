@@ -1,19 +1,17 @@
 <?php
 
-namespace application\models;
+namespace app\services;
 
-use application\core\Api;
-use application\models\User;
-
-class Auth extends Api
+class AuthService
 {
     private static $header = ['typ' => 'JWT', 'alg' => 'HS256'];
     private static $tokenLifetime = 43200; //12 hours
 
-    public static function token($params=[])
+    public static function generateToken($params=[])
     {
-        $user = new User();
-        $userData = $user->getUserByUsername($params['username']);
+
+        $userService = new UserService();
+        $userData = $userService->getUserByUsername($params['username']);
 
         if (!$userData) {
             send(401, false, 'User not found');

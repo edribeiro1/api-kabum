@@ -8,7 +8,7 @@ $baseUrl .= $_SERVER['HTTP_HOST'];
 $baseUrl .= str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
 
 define('BASE_URL', $baseUrl);
-define('APPPATH', 'application/');
+define('APPPATH', 'app/');
 
 $envs = parse_ini_file('.env');
 

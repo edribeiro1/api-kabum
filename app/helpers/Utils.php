@@ -1,6 +1,6 @@
 <?php
 
-// namespace application\helpers;
+// namespace app\helpers;
 
 // class Utils
 // {

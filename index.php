@@ -1,5 +1,5 @@
 <?php
 
-require_once('application/config/Autoload.php');
+require_once('app/config/Autoload.php');
 
-application\services\Router::initialize();
+app\config\Router::initialize();

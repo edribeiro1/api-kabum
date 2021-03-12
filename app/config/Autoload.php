@@ -1,10 +1,6 @@
 <?php
 
-require_once('application/config/Config.php');
-
-// foreach (glob(APPPATH.'services/*.php') as $file) {
-//     require_once $file;
-// }
+require_once('app/config/Config.php');
 
 foreach (glob(APPPATH.'helpers/*.php') as $file) {
     require_once $file;

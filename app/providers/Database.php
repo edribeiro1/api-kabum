@@ -1,9 +1,12 @@
 <?php
 
-namespace application\services;
+namespace app\providers;
 
-class Database
+use app\interfaces\IDatabase;
+
+class Database implements IDatabase
 {
+    
     private $columns = '*';
     private $where = "";
     private $stmtParams = [];
@@ -73,20 +76,27 @@ class Database
         }
     }
 
-    public function get()
+    public function get($fetchAll = false)
     {
         $data = false;
-        if ($this->table && $this->where) {
+        if ($this->table) {
 
             $stmtQuery = "SELECT $this->columns FROM $this->table $this->where";
             
             if ($statement = $this->connection->prepare($stmtQuery)) {
-                $statement->bind_param($this->stmtTypes, ...$this->stmtParams);
+                if ($this->where) {
+                    $statement->bind_param($this->stmtTypes, ...$this->stmtParams);
+                }
                 $statement->execute();
                 $result = $statement->get_result();
     
                 if ($result->num_rows) {
-                    $data = $result->fetch_assoc();
+
+                    if ($fetchAll) {
+                        $data = $result->fetch_all(MYSQLI_ASSOC);
+                    } else {
+                        $data = $result->fetch_assoc();
+                    }
                 }
 
                 $statement->close();
@@ -96,6 +106,27 @@ class Database
         }
 
         return $data;
+    }
+
+    public function count()
+    {
+        if ($this->table) {
+            $stmtQuery = "SELECT count(*) as total FROM $this->table $this->where";
+
+            if ($statement = $this->connection->prepare($stmtQuery)) {
+                if ($this->where) {
+                    $statement->bind_param($this->stmtTypes, ...$this->stmtParams);
+                }
+                $statement->execute();
+                $result = $statement->get_result();
+                if ($result->num_rows) {
+                    $data = $result->fetch_assoc();
+                    return $data['total'];
+                }
+            }
+        }
+
+        return 0;
     }
 
     public function insert()
