@@ -1,6 +1,6 @@
 <?php
 
-use app\models\Customer as CustomerModel;
+use app\services\CustomerService;
 use app\interfaces\IController;
 
 class Customer implements IController
@@ -34,16 +34,16 @@ class Customer implements IController
 
     private function getMethod($id)
     {
-        $customer = new CustomerModel();
+        $customerService = new CustomerService();
         
         if ($id && is_numeric($id)) {
-            $data = $customer->getCustomerById($id);
+            $data = $customerService->getCustomerById($id);
             if ($data) {
                 send(200, true, 'Success', $data);
             }
             send(400, false, 'Customer not found');
         } else {
-            $data = $customer->getAllCustomer();
+            $data = $customerService->getAllCustomer();
             if ($data) {
                 send(200, true, 'Success', $data);
             }
