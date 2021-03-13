@@ -3,13 +3,24 @@
 namespace app\middlewares;
 
 use app\services\AuthService;
+use app\services\UserService;
+use app\entities\User;
+use Exception;
 
-class Authentication 
+class Authentication
 {
     public static function authenticate()
     {
-        $tokenData = AuthService::validate();
-        // $this->user_id = $tokenData['user_id'];
-        return $tokenData;
+        try {
+            $tokenData = AuthService::validate();
+        } catch (Exception $e) {
+            send($e->getCode(), $e->getMessage());
+        }
+
+        $user = new User();
+        $user->name = $tokenData['name'];
+        $user->id = $tokenData['user_id'];
+
+        UserService::setAuthenticatedUser($user);
     }
 }

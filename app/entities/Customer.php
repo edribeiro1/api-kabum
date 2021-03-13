@@ -2,16 +2,16 @@
 
 namespace app\entities;
 
-class Customer 
+class Customer
 {
-    public $id;
+    public $id = null;
     public $name;
     public $birthDate;
     public $cpf;
     public $rg;
     public $phoneNumber;
 
-    public function __construct($name="", $birthDate="", $cpf="", $rg="", $phoneNumber="", $id=0)
+    public function __construct($name = "", $birthDate = "", $cpf = "", $rg = "", $phoneNumber = "", $id = null)
     {
         $this->name = $name;
         $this->birthDate = $birthDate;

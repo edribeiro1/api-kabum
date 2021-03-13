@@ -1,6 +1,6 @@
 <?php
 
-function send($statusCode=200, $status=true, $message=false, $data=false)
+function send($statusCode=200, $message=false, $data=false)
 {
     $statusTexts = array(
         200 => 'OK',
@@ -23,12 +23,10 @@ function send($statusCode=200, $status=true, $message=false, $data=false)
     );
 
     $params = [];
-    if (is_array($data)) {
+    if (is_array($data) || is_object($data)) {
         $params['data'] = $data;
     }
-    if (is_bool($status)) {
-        $params['status'] = $status;
-    }
+  
     if ($message) {
         $params["message"] = $message;
     }

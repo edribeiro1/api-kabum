@@ -2,68 +2,71 @@
 
 use app\services\CustomerService;
 use app\interfaces\IController;
+use app\dto\ListDTO;
 
 class Customer implements IController
 {
 
-    public function index($id=false)
+    public function __construct()
+    {
+        $this->customerService = new CustomerService();
+    }
+
+    public function index($id = null)
     {
 
         switch (method()) {
-            case 'GET': 
-                $this->getMethod($id); 
+            case 'GET':
+                $this->getMethod($id);
                 break;
 
-            case 'POST': 
-                $this->postMethod(); 
+            case 'POST':
+                $this->postMethod();
                 break;
 
-            case 'PUT': 
-                $this->putMethod($id); 
+            case 'PUT':
+                $this->putMethod($id);
                 break;
 
-            case 'DELETE': 
-                $this->deleteMethod($id); 
+            case 'DELETE':
+                $this->deleteMethod($id);
                 break;
-            
-            default: 
-                send(400, false, 'Method not implemented'); 
+
+            default:
+                send(400, 'Method not implemented');
                 break;
         }
     }
 
     private function getMethod($id)
     {
-        $customerService = new CustomerService();
-        
         if ($id && is_numeric($id)) {
-            $data = $customerService->getCustomerById($id);
-            if ($data) {
-                send(200, true, 'Success', $data);
+            try {
+                $data = $this->customerService->getCustomerById($id);
+                send(200, 'Success', $data);
+            } catch (Exception $e) {
+                send($e->getCode(), $e->getMessage());
             }
-            send(400, false, 'Customer not found');
         } else {
-            $data = $customerService->getAllCustomer();
-            if ($data) {
-                send(200, true, 'Success', $data);
+            try {
+                $params = getContents();
+                $data = $this->customerService->list(new ListDTO($params));
+                send(200, 'Success', $data);
+            } catch (Exception $e) {
+                send($e->getCode(), $e->getMessage());
             }
-            send(400, false, 'Customers not found');
         }
     }
 
     private function postMethod()
     {
-        
     }
 
     private function putMethod($id)
     {
-        
     }
 
     private function deleteMethod($id)
     {
-        
     }
-
 }

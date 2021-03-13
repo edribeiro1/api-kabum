@@ -3,15 +3,15 @@
 namespace app\providers;
 
 use app\interfaces\IDatabase;
+use Exception;
 
 class Database implements IDatabase
 {
-    
+
     private $columns = '*';
     private $where = "";
     private $stmtParams = [];
     private $stmtTypes = '';
-    private $parametersWhere = [];
     private $table = false;
 
     public function __construct()
@@ -34,38 +34,63 @@ class Database implements IDatabase
         }
     }
 
-    public function typeValue($value)
+    public function typeValue($value): string
     {
         $type = gettype($value);
         switch ($type) {
-            case 'integer': return 'i'; break;
-            case 'double': return 'd'; break;
-            default: return 's'; break;
+            case 'integer':
+                return 'i';
+                break;
+            case 'double':
+                return 'd';
+                break;
+            default:
+                return 's';
+                break;
         }
     }
 
-    public function where($key, $value = false, $cmp = " = ")
+    public function where($key, $value, $cmp = " = ")
     {
         $prefix = 'WHERE';
         if (strlen($this->where) > 1) {
             $prefix = ' AND';
         }
-        if (is_string($key) && strlen($key) &&
-           (is_string($value) || is_integer($value) || is_double($value) || is_array($value))
+        if (
+            validateString($key) &&
+            (is_string($value) || is_integer($value) || is_double($value) || is_array($value))
         ) {
             if (is_array($value)) {
                 if (count($value)) {
                     $stmtType = $this->typeValue($value[0]);
                     $mark = implode(',', array_fill(0, count($value), '?'));
                     $this->where .= "$prefix $key $cmp ($mark)";
-                    $this->stmtTypes .= str_repeat($stmtType, count($array));
-                    $this->stmtParams[] = array_merge($this->stmtParams, $value);
+                    $this->stmtTypes .= str_repeat($stmtType, count($value));
+                    $this->stmtParams = array_merge($this->stmtParams, $value);
                 }
             } else {
                 $this->where .= "$prefix $key $cmp ?";
                 $this->stmtTypes .= $this->typeValue($value);
                 $this->stmtParams[] = $value;
             }
+        } else {
+            throw new Exception('Parameters in the method where are invalid', 500);
+        }
+    }
+
+    public function like($key, $value)
+    {
+        $prefix = 'WHERE';
+        if (strlen($this->where) > 1) {
+            $prefix = ' AND';
+        }
+
+        if (validateString($key) && validateString($value)) {
+            $this->where .= "$prefix $key LIKE ? ";
+            $this->stmtTypes .= $this->typeValue($value);
+            $this->stmtParams[] = "%$value%";
+        } else {
+            throw new Exception('Parameters in the method like are invalid', 500);
         }
     }
 
@@ -76,20 +101,21 @@ class Database implements IDatabase
         }
     }
 
-    public function get($fetchAll = false)
+    public function get($fetchAll = false): array
     {
-        $data = false;
+        $data = [];
         if ($this->table) {
 
             $stmtQuery = "SELECT $this->columns FROM $this->table $this->where";
-            
+
             if ($statement = $this->connection->prepare($stmtQuery)) {
+
                 if ($this->where) {
                     $statement->bind_param($this->stmtTypes, ...$this->stmtParams);
                 }
                 $statement->execute();
                 $result = $statement->get_result();
-    
+
                 if ($result->num_rows) {
 
                     if ($fetchAll) {
@@ -101,7 +127,7 @@ class Database implements IDatabase
 
                 $statement->close();
             };
-            
+
             $this->cleanAfterOperation();
         }
 

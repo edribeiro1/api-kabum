@@ -7,20 +7,19 @@ class Auth
     public function index()
     {
         if (!method() == 'POST') {
-            send(400, false, 'Invalid method: '. method());
+            send(400, 'Invalid method: ' . method());
         }
 
         $params = getContents();
         if (!isset($params['username']) || !isset($params['password'])) {
-            send(400, false, 'Invalid params');
+            send(400, 'Missing parameters: username, password');
         }
 
-        $data = AuthService::generateToken($params);
-
-        if ($data) {
-            send(200, true, 'Token successfully generated', $data);
+        try {
+            $data = AuthService::generateToken($params);
+            send(200, 'Token successfully generated', $data);
+        } catch (Exception $e) {
+            send($e->getCode(), $e->getMessage());
         }
-
-        send(400, false, 'Error generate token');
     }
 }

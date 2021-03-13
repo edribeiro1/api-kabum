@@ -4,15 +4,19 @@ namespace app\entities;
 
 class User
 {
-    public $id;
+    public $id = null;
     public $username;
     public $password;
     public $name;
 
-    public function __construct($username="", $password="", $name="")
+    public function __construct($username = "", $password = "", $name = "", $id = null)
     {
-        $this->$username = $username;
-        $this->$password = $password;
-        $this->$name = $name;
+        $this->username = $username;
+        $this->password = $password;
+        $this->name = $name;
+
+        if ($id && is_numeric($id)) {
+            $this->id = (int)$id;
+        }
     }
 }

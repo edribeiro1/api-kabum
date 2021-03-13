@@ -3,16 +3,32 @@
 namespace app\services;
 
 use app\storage\CustomerStorage;
+use app\dto\ListDTO;
+
 
 class CustomerService
 {
-    public function __construct() {
+
+    public function __construct()
+    {
         $this->customerStorage = new CustomerStorage();
     }
 
-    public function getAllCustomer()
+    public function list(ListDTO $params)
     {
-        return $this->customerStorage->getAllCustomer();
+
+        $customers = [];
+        $total = $this->customerStorage->count($params);
+
+        if ($total) {
+            $customers = $this->customerStorage->list($params);
+        }
+
+        return [
+            'total' => $total,
+            'customers' => $customers
+        ];
+
     }
 
     public function getCustomerById($id)

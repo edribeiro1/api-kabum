@@ -2,35 +2,37 @@
 
 namespace app\services;
 
+use Exception;
+
 class AuthService
 {
     private static $header = ['typ' => 'JWT', 'alg' => 'HS256'];
     private static $tokenLifetime = 43200; //12 hours
 
-    public static function generateToken($params=[])
+    public static function generateToken($params = [])
     {
 
         $userService = new UserService();
-        $userData = $userService->getUserByUsername($params['username']);
+        $user = $userService->getUserByUsername($params['username']);
 
-        if (!$userData) {
-            send(401, false, 'User not found');
+        if (!$user) {
+            throw new Exception('User not found', 401);
         }
 
-        if ($userData['password'] == md5($params['password'])) {
+        if ($user->password == md5($params['password'])) {
             $expire = time() + self::$tokenLifetime;
-            $token = self::generateHashToken($userData, $expire);
-            return ['token'=> $token, 'expire' => $expire];
+            $token = self::generateHashToken($user->id, $user->name, $expire);
+            return ['token' => $token, 'expire' => $expire];
         }
 
-        send(401, false, 'Could not verify');
+        throw new Exception('Could not verify', 401);
     }
 
-    private static function generateHashToken($userData, $expire)
+    private static function generateHashToken($id, $name, $expire)
     {
         $payload = [
-            'user_id' => $userData['id'],
-            'name' => $userData['name'],
+            'user_id' => $id,
+            'name' => $name,
             'exp' => $expire
         ];
 
@@ -50,7 +52,7 @@ class AuthService
     {
         $headers = getallheaders();
         if (!isset($headers['authorization']) && !isset($headers['Authorization'])) {
-            send(401, false, 'Authorization not found');
+            throw new Exception('Missing authorization parameter in the header', 401);
         }
         $authorizationToken = isset($headers['authorization']) ? $headers['authorization'] : $headers['Authorization'];
 
@@ -73,18 +75,18 @@ class AuthService
             $payload = json_decode($payload, true);
             $expiration = $payload['exp'];
 
-            
+
             if (time() > $expiration) {
-                send(401, false, 'Token has expired');
+                throw new Exception('Token has expired', 401);
             }
 
             if ($signatureProvided === $signature) {
                 return $payload;
             }
 
-            send(401, false, 'Token is not valid');
-        } else {
-            send(401, false, 'Expected bearer token');
+            throw new Exception('Token is not valid', 401);
         }
+
+        throw new Exception('Expected bearer token', 401);
     }
 }

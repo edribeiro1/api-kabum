@@ -40,25 +40,18 @@ class Router
             if ($className) {
                 require_once(APPPATH."controllers/$pathModule");
 
-                $authData = false;
                 if ($className != 'Auth') {
-                    $authData = Authentication::authenticate();
+                    Authentication::authenticate();
                 }
 
                 $class = new $className();
-
-                if ($authData) {
-                    $class->authData = $authData;
-                }
-
                 $class->$method($param);
             } else {
-                send(404, false, 'Module not found');
+                send(404, 'Module not found');
             }
         } else {
             send(
                 200,
-                true,
                 'Api processo seletivo KaBuM!',
                 [
                 'description' => 'API KaBuM',

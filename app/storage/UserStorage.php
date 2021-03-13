@@ -12,6 +12,17 @@ class UserStorage extends DatabaseStorage
         // $this->db->select('id, username, password');
         $this->db->where('username', $username);
         $this->db->from($this->schema);
-        return $this->db->get();
+        $result = $this->db->get();
+
+        if ($result && count($result)) {
+            return new User(
+                $result['username'],
+                $result['password'],
+                $result['name'],
+                $result['id']
+            );
+        }
+
+        return null;
     }
 }
