@@ -16,11 +16,16 @@ class CustomerService
         $this->customerStorage = new CustomerStorage();
     }
 
-    public function saveCustomer(Customer $customer)
+    public function upsertCustomer(Customer $customer)
     {
         $customerStorageArray = $this->customerToStorageArray($customer);
-        unset($customerStorageArray['id']);
-        $this->customerStorage->save($customerStorageArray);
+
+        if (validateStrictlyPositiveNumber($customerStorageArray['id'])) {
+            $this->customerStorage->update($customerStorageArray);
+        } else {
+            unset($customerStorageArray['id']);
+            $this->customerStorage->save($customerStorageArray);
+        }
     }
 
     public function getCustomerList(ListDTO $params)
@@ -56,5 +61,10 @@ class CustomerService
         }
 
         throw new Exception('Instance customer is invalid', 500);
+    }
+
+    public function deleteCustomer(int $id)
+    {
+        return $this->customerStorage->delete($id);
     }
 }

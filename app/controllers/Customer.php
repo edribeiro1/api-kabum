@@ -72,7 +72,7 @@ class Customer implements IController
                 $params['phone_number'] ?? null
             );
 
-            $this->customerService->saveCustomer($customer);
+            $this->customerService->upsertCustomer($customer);
             send(200, 'Registered successfully');
         } catch (Exception $e) {
             send($e->getCode(), $e->getMessage());
@@ -88,8 +88,18 @@ class Customer implements IController
 
         try {
             $params = getContents();
-            $this->customerService->updateCustomer($id);
-            send(200, 'Successfully registered');
+
+            $customer = new CustomerEntities(
+                $params['name'] ?? null,
+                $params['birth_date'] ?? null,
+                $params['cpf'] ?? null,
+                $params['rg'] ?? null,
+                $params['phone_number'] ?? null,
+                $id
+            );
+
+            $this->customerService->upsertCustomer($customer);
+            send(200, 'Successfully updated');
         } catch (Exception $e) {
             send($e->getCode(), $e->getMessage());
         }
@@ -103,8 +113,13 @@ class Customer implements IController
         }
 
         try {
-            $this->customerService->deleteCustomer($id);
-            send(200, 'Successfully deleted');
+            $status = $this->customerService->deleteCustomer((int)$id);
+
+            if ($status) {
+                send(200, 'Successfully deleted');
+            } else {
+                send(400, 'It was not possible to delete this customer');
+            }
         } catch (Exception $e) {
             send($e->getCode(), $e->getMessage());
         }

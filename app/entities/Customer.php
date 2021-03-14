@@ -42,7 +42,7 @@ class Customer
         }
 
         if (validateStrictlyPositiveNumber($id)) {
-            $this->id = $id;
+            $this->id = (int)$id;
         }
     }
 

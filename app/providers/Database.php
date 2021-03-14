@@ -106,6 +106,7 @@ class Database implements IDatabase
     {
         if (is_array($sets) && count($sets)) {
             foreach ($sets as $key => $value) {
+                $this->set($key, $value);
             }
         }
     }
@@ -152,7 +153,7 @@ class Database implements IDatabase
         }
     }
 
-    public function from($table)
+    public function table($table)
     {
         if (is_string($table) && strlen($table)) {
             $this->table = $table;
@@ -252,10 +253,50 @@ class Database implements IDatabase
 
     public function delete()
     {
+        $status = false;
+        if ($this->table && $this->where) {
+            $stmtQuery = "DELETE FROM $this->table $this->where";
+
+            if ($statement = $this->connection->prepare($stmtQuery)) {
+                $statement->bind_param($this->stmtTypes, ...$this->stmtParams);
+                $statement->execute();
+
+                if ($statement->affected_rows) {
+                    $status = true;
+                }
+                $statement->close();
+            }
+        } else {
+            throw new Exception("Error in method 'delete'", 500);
+        }
+
+        $this->cleanAfterOperation();
+        return $status;
     }
 
     public function update()
     {
+        $status = false;
+        if ($this->table && $this->set && $this->where) {
+
+            $stmtQuery = "UPDATE $this->table $this->set $this->where $this->limit";
+
+            if ($statement = $this->connection->prepare($stmtQuery)) {
+                $types = $this->stmtTypesSet . $this->stmtTypes;
+                $params = array_merge($this->stmtParamsSet, $this->stmtParams);
+                $statement->bind_param($types, ...$params);
+                $statement->execute();
+
+                if ($statement->affected_rows) {
+                    $status = true;
+                }
+
+                $statement->close();
+            };
+        }
+
+        $this->cleanAfterOperation();
+        return $status;
     }
 
     private function cleanAfterOperation()

@@ -10,7 +10,7 @@ interface IDatabase
     public function where($key, $value, $cmp = " = ");
     public function like($key, $value);
     public function orderBy($column, $order = "ASC");
-    public function from($table);
+    public function table($table);
     public function get($fetchAll = false);
     public function count();
     public function insert($dataInsert);

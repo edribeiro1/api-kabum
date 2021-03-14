@@ -11,31 +11,35 @@ class CustomerStorage extends DatabaseStorage
 
     private $schema = 'customer';
 
-
-    public function save($customer)
+    public function update(array $customer)
     {
-        $this->db->from($this->schema);
+        $this->db->where('id', $customer['id']);
+        $this->db->table($this->schema);
+        unset($customer['id']);
+        $this->db->setAll($customer);
+        $this->db->update();
+    }
+
+    public function save(array $customer)
+    {
+        $this->db->table($this->schema);
         $this->db->insert($customer);
     }
 
     public function count(ListDTO $params)
     {
-
         if (!is_null($params->searchColumn) && !is_null($params->search)) {
             $this->db->like($params->searchColumn, $params->search);
         }
 
-        $this->db->from($this->schema);
+        $this->db->table($this->schema);
         $total = $this->db->count();
 
         return $total;
     }
 
-   
-
     public function list(ListDTO $params)
     {
-
         if (!is_null($params->searchColumn) && !is_null($params->search)) {
             $this->db->like($params->searchColumn, $params->search);
         }
@@ -48,16 +52,16 @@ class CustomerStorage extends DatabaseStorage
         if (!is_null($params->sortColumn)) {
             $this->db->orderBy($params->sortColumn, $params->order);
         }
-        
-        $this->db->from($this->schema);
+
+        $this->db->table($this->schema);
         $result = $this->db->get(true);
         return $result;
     }
 
-    public function getCustomerById($id)
+    public function getCustomerById(int $id)
     {
         $this->db->where('id', $id);
-        $this->db->from($this->schema);
+        $this->db->table($this->schema);
         $result = $this->db->get();
 
         if (count($result)) {
@@ -79,5 +83,14 @@ class CustomerStorage extends DatabaseStorage
         //     $result['addresses'] = $addresses ? $addresses : [];
         // }
 
+    }
+
+    public function delete(int $id)
+    {
+        $this->db->where('id', $id);
+        $this->db->table($this->schema);
+        $status = $this->db->delete();
+
+        return $status;
     }
 }

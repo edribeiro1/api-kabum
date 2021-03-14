@@ -10,7 +10,7 @@ class UserStorage extends DatabaseStorage
     public function getUserByUsername($username="")
     {
         $this->db->where('username', $username);
-        $this->db->from($this->schema);
+        $this->db->table($this->schema);
         $result = $this->db->get();
 
         if ($result && count($result)) {

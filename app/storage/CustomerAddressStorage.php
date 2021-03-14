@@ -11,7 +11,7 @@ class CustomerAddressStorage extends DatabaseStorage
     public function getAllAddressByCustomerId($id)
     {
         $this->db->where('customer_id', $id);
-        $this->db->from($this->schema);
+        $this->db->table($this->schema);
         $result = $this->db->get(true);
 
         return $result;

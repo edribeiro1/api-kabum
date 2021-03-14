@@ -15,7 +15,7 @@ class User
         $this->password = $password;
         $this->name = $name;
 
-        if ($id && is_numeric($id)) {
+        if (validateStrictlyPositiveNumber($id)) {
             $this->id = (int)$id;
         }
     }
