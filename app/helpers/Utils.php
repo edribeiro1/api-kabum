@@ -1,9 +1,32 @@
 <?php
 
-// namespace app\helpers;
+function camelCaseToSnakeCase($text = "")
+{
+    $pattern = '!([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)!';
+    preg_match_all($pattern, trim($text), $matches);
+    $ret = $matches[0];
+    foreach ($ret as &$match) {
+        $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
+    }
+    return implode('_', $ret);
+}
 
-// class Utils
-// {
+function validateStrictlyPositiveNumber($number)
+{
+    if (is_numeric($number) && (int)$number > 0) {
+        return true;
+    }
+    return false;
+}
+
+function validateDate($stringDate)
+{
+    $datetime = DateTime::createFromFormat('Y-m-d', trim($stringDate));
+    if ($datetime) {
+        return true;
+    }
+    return false;
+}
 
 function validateString($string)
 {
@@ -56,4 +79,3 @@ function getContents($paramentro = false)
     }
     return false;
 }
-// }

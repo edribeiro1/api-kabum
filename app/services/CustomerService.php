@@ -3,8 +3,10 @@
 namespace app\services;
 
 use app\storage\CustomerStorage;
+use app\entities\Customer;
 use app\dto\ListDTO;
 
+use Exception;
 
 class CustomerService
 {
@@ -14,9 +16,15 @@ class CustomerService
         $this->customerStorage = new CustomerStorage();
     }
 
-    public function list(ListDTO $params)
+    public function saveCustomer(Customer $customer)
     {
+        $customerStorageArray = $this->customerToStorageArray($customer);
+        unset($customerStorageArray['id']);
+        $this->customerStorage->save($customerStorageArray);
+    }
 
+    public function getCustomerList(ListDTO $params)
+    {
         $customers = [];
         $total = $this->customerStorage->count($params);
 
@@ -28,11 +36,25 @@ class CustomerService
             'total' => $total,
             'customers' => $customers
         ];
-
     }
 
     public function getCustomerById($id)
     {
         return $this->customerStorage->getCustomerById($id);
+    }
+
+    public function customerToStorageArray(Customer $customer)
+    {
+        if ($customer instanceof Customer) {
+            $customerArray = (array)$customer;
+            $customerStorageArray = [];
+
+            foreach ($customerArray as $key => $value) {
+                $customerStorageArray[camelCaseToSnakeCase($key)] = $value;
+            }
+            return $customerStorageArray;
+        }
+
+        throw new Exception('Instance customer is invalid', 500);
     }
 }

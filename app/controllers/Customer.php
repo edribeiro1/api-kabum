@@ -3,6 +3,7 @@
 use app\services\CustomerService;
 use app\interfaces\IController;
 use app\dto\ListDTO;
+use app\entities\Customer as CustomerEntities;
 
 class Customer implements IController
 {
@@ -40,7 +41,7 @@ class Customer implements IController
 
     private function getMethod($id)
     {
-        if ($id && is_numeric($id)) {
+        if (validateStrictlyPositiveNumber($id)) {
             try {
                 $data = $this->customerService->getCustomerById($id);
                 send(200, 'Success', $data);
@@ -50,7 +51,7 @@ class Customer implements IController
         } else {
             try {
                 $params = getContents();
-                $data = $this->customerService->list(new ListDTO($params));
+                $data = $this->customerService->getCustomerList(new ListDTO($params));
                 send(200, 'Success', $data);
             } catch (Exception $e) {
                 send($e->getCode(), $e->getMessage());
@@ -60,13 +61,52 @@ class Customer implements IController
 
     private function postMethod()
     {
+        try {
+            $params = getContents();
+
+            $customer = new CustomerEntities(
+                $params['name'] ?? null,
+                $params['birth_date'] ?? null,
+                $params['cpf'] ?? null,
+                $params['rg'] ?? null,
+                $params['phone_number'] ?? null
+            );
+
+            $this->customerService->saveCustomer($customer);
+            send(200, 'Registered successfully');
+        } catch (Exception $e) {
+            send($e->getCode(), $e->getMessage());
+        }
     }
 
     private function putMethod($id)
     {
+
+        if (!validateStrictlyPositiveNumber($id)) {
+            send(400, 'It is not possible to update without an "id"');
+        }
+
+        try {
+            $params = getContents();
+            $this->customerService->updateCustomer($id);
+            send(200, 'Successfully registered');
+        } catch (Exception $e) {
+            send($e->getCode(), $e->getMessage());
+        }
     }
 
     private function deleteMethod($id)
     {
+
+        if (!validateStrictlyPositiveNumber($id)) {
+            send(400, 'It is not possible to delete without an "id"');
+        }
+
+        try {
+            $this->customerService->deleteCustomer($id);
+            send(200, 'Successfully deleted');
+        } catch (Exception $e) {
+            send($e->getCode(), $e->getMessage());
+        }
     }
 }

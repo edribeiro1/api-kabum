@@ -2,6 +2,7 @@
 
 namespace app\interfaces;
 
-interface IController {
-    public function index($id=null);
+interface IController
+{
+    public function index($id = null);
 }

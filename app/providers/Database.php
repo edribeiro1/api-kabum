@@ -11,8 +11,14 @@ class Database implements IDatabase
     private $columns = '*';
     private $where = "";
     private $stmtParams = [];
+    private $stmtParamsSet = [];
     private $stmtTypes = '';
+    private $stmtTypesSet = '';
     private $table = false;
+    private $limit = '';
+    private $offset = '';
+    private $orderBy = '';
+    private $set = '';
 
     public function __construct()
     {
@@ -31,6 +37,24 @@ class Database implements IDatabase
             $this->columns = implode(',', $columns);
         } elseif (is_string($columns) && strlen($columns) > 0) {
             $this->columns = $columns;
+        }
+    }
+
+    public function limit($limit)
+    {
+        if (is_numeric($limit)) {
+            $this->limit = "LIMIT $limit";
+        } else {
+            throw new Exception("Parameter in the method 'limit' is invalid", 500);
+        }
+    }
+
+    public function offset($offset)
+    {
+        if (is_numeric($offset)) {
+            $this->offset = "OFFSET $offset";
+        } else {
+            throw new Exception("Parameter in the method 'offset' is invalid", 500);
         }
     }
 
@@ -74,7 +98,32 @@ class Database implements IDatabase
                 $this->stmtParams[] = $value;
             }
         } else {
-            throw new Exception('Parameters in the method where are invalid', 500);
+            throw new Exception("Parameters in the method 'where' are invalid", 500);
+        }
+    }
+
+    public function setAll($sets = [])
+    {
+        if (is_array($sets) && count($sets)) {
+            foreach ($sets as $key => $value) {
+            }
+        }
+    }
+
+    public function set($key, $value)
+    {
+        $prefix = 'SET';
+        if (strlen($this->set) > 1) {
+            $prefix = ' , ';
+        }
+        if (
+            validateString($key) && (is_string($value) || is_integer($value) || is_double($value) || is_null($value))
+        ) {
+            $this->set .= "$prefix $key = ?";
+            $this->stmtTypesSet .= $this->typeValue($value);
+            $this->stmtParamsSet[] = $value;
+        } else {
+            throw new Exception("Parameters in the method 'set' are invalid", 500);
         }
     }
 
@@ -90,7 +139,16 @@ class Database implements IDatabase
             $this->stmtTypes .= $this->typeValue($value);
             $this->stmtParams[] = "%$value%";
         } else {
-            throw new Exception('Parameters in the method like are invalid', 500);
+            throw new Exception("Parameters in the method 'like' are invalid", 500);
+        }
+    }
+
+    public function orderBy($column, $order = "ASC")
+    {
+        if (validateString($column) && validateString($order)) {
+            $this->orderBy = "ORDER BY $column $order";
+        } else {
+            throw new Exception("Parameters in the method 'orderBy' are invalid", 500);
         }
     }
 
@@ -106,7 +164,7 @@ class Database implements IDatabase
         $data = [];
         if ($this->table) {
 
-            $stmtQuery = "SELECT $this->columns FROM $this->table $this->where";
+            $stmtQuery = "SELECT $this->columns FROM $this->table $this->where $this->orderBy $this->limit $this->offset";
 
             if ($statement = $this->connection->prepare($stmtQuery)) {
 
@@ -127,10 +185,9 @@ class Database implements IDatabase
 
                 $statement->close();
             };
-
-            $this->cleanAfterOperation();
         }
 
+        $this->cleanAfterOperation();
         return $data;
     }
 
@@ -152,11 +209,45 @@ class Database implements IDatabase
             }
         }
 
+        $this->cleanAfterOperation();
         return 0;
     }
 
-    public function insert()
+    public function insert($dataInsert)
     {
+        $status = false;
+        if ($this->table && is_array($dataInsert) && count($dataInsert)) {
+            $collumns = [];
+            $values = [];
+            $types = "";
+            $marks = "";
+
+            foreach ($dataInsert as $key => $value) {
+                $collumns[] = $key;
+                $values[] = $value;
+                $types .= $this->typeValue($value);
+            }
+
+            $mark = implode(',', array_fill(0, count($values), '?'));
+            $collumns = implode(', ', $collumns);
+
+            $stmtQuery = "INSERT INTO $this->table ($collumns) VALUES ($mark)";
+
+            if ($statement = $this->connection->prepare($stmtQuery)) {
+                $statement->bind_param($types, ...$values);
+                $statement->execute();
+
+                if ($statement->affected_rows) {
+                    $status = true;
+                }
+
+                $statement->close();
+            };
+        } else {
+            throw new Exception("Invalid data in method 'insert'", 500);
+        }
+        $this->cleanAfterOperation();
+        return $status;
     }
 
     public function delete()
@@ -171,9 +262,12 @@ class Database implements IDatabase
     {
         $this->columns = '*';
         $this->where = false;
+        $this->set = false;
         $this->table = false;
         $this->stmtParams = [];
+        $this->stmtParamsSet = [];
         $this->stmtTypes = '';
+        $this->stmtTypesSet = '';
     }
 
     public function __destruct()

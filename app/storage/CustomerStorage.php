@@ -11,26 +11,45 @@ class CustomerStorage extends DatabaseStorage
 
     private $schema = 'customer';
 
+
+    public function save($customer)
+    {
+        $this->db->from($this->schema);
+        $this->db->insert($customer);
+    }
+
     public function count(ListDTO $params)
     {
 
-        if (!is_null($params['search_column']) && !is_null($params['search'])) {
-            $this->db->like($params['search_column'], $params['search']);
+        if (!is_null($params->searchColumn) && !is_null($params->search)) {
+            $this->db->like($params->searchColumn, $params->search);
         }
 
-        $this->db->from($this->table);
+        $this->db->from($this->schema);
         $total = $this->db->count();
+
         return $total;
     }
+
+   
 
     public function list(ListDTO $params)
     {
 
-        if (!is_null($params['search_column']) && !is_null($params['search'])) {
-            $this->db->like($params['search_column'], $params['search']);
+        if (!is_null($params->searchColumn) && !is_null($params->search)) {
+            $this->db->like($params->searchColumn, $params->search);
+        }
+
+        if (!is_null($params->limit) && !is_null($params->offset)) {
+            $this->db->limit($params->limit);
+            $this->db->offset($params->offset);
+        }
+
+        if (!is_null($params->sortColumn)) {
+            $this->db->orderBy($params->sortColumn, $params->order);
         }
         
-        $this->db->from($this->table);
+        $this->db->from($this->schema);
         $result = $this->db->get(true);
         return $result;
     }

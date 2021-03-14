@@ -19,13 +19,17 @@ class AuthService
             throw new Exception('User not found', 401);
         }
 
-        if ($user->password == md5($params['password'])) {
-            $expire = time() + self::$tokenLifetime;
-            $token = self::generateHashToken($user->id, $user->name, $expire);
-            return ['token' => $token, 'expire' => $expire];
+        if ($user->password != md5($params['password'])) {
+            throw new Exception('Could not verify', 401);
         }
 
-        throw new Exception('Could not verify', 401);
+
+        $expire = time() + self::$tokenLifetime;
+        $token = self::generateHashToken($user->id, $user->name, $expire);
+        return [
+            'token' => $token, 
+            'expire' => $expire
+        ];
     }
 
     private static function generateHashToken($id, $name, $expire)
@@ -54,6 +58,7 @@ class AuthService
         if (!isset($headers['authorization']) && !isset($headers['Authorization'])) {
             throw new Exception('Missing authorization parameter in the header', 401);
         }
+
         $authorizationToken = isset($headers['authorization']) ? $headers['authorization'] : $headers['Authorization'];
 
         $authorizationToken = explode(' ', $authorizationToken);
@@ -87,6 +92,6 @@ class AuthService
             throw new Exception('Token is not valid', 401);
         }
 
-        throw new Exception('Expected bearer token', 401);
+        throw new Exception('Expected Bearer token', 401);
     }
 }

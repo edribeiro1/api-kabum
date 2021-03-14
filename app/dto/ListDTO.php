@@ -26,7 +26,7 @@ class ListDTO
             $this->sortColumn = trim($params['sort']);
         }
 
-        if (isset($params['order']) && validateString($params['sort']) && strtoupper($params['sort']) === 'DESC') {
+        if (isset($params['order']) && validateString($params['order']) && strtoupper($params['order']) === 'DESC') {
             $this->order = strtoupper(trim($params['order']));
         }
 

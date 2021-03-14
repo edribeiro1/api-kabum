@@ -37,7 +37,7 @@ function send($statusCode=200, $message=false, $data=false)
     header('Content-Type: application/json');
 
     if (count($params)) {
-        echo json_encode($params);
+        echo json_encode($params, true);
     }
     die;
 }
