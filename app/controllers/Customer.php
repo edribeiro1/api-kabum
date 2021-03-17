@@ -66,10 +66,11 @@ class Customer implements IController
 
             $customer = new CustomerEntities(
                 $params['name'] ?? null,
-                $params['birth_date'] ?? null,
+                $params['birthDate'] ?? null,
                 $params['cpf'] ?? null,
                 $params['rg'] ?? null,
-                $params['phone_number'] ?? null
+                $params['phoneNumber'] ?? null,
+                $params['address'] ?? []
             );
 
             $this->customerService->upsertCustomer($customer);
@@ -91,10 +92,11 @@ class Customer implements IController
 
             $customer = new CustomerEntities(
                 $params['name'] ?? null,
-                $params['birth_date'] ?? null,
+                $params['birthDate'] ?? null,
                 $params['cpf'] ?? null,
                 $params['rg'] ?? null,
-                $params['phone_number'] ?? null,
+                $params['phoneNumber'] ?? null,
+                $params['address'] ?? [],
                 $id
             );
 

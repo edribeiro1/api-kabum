@@ -12,8 +12,9 @@ class Customer
     public $cpf = null;
     public $rg = null;
     public $phoneNumber = null;
+    public $address = [];
 
-    public function __construct($name="", $birthDate = null, $cpf = null, $rg = null, $phoneNumber = null, $id = null)
+    public function __construct($name="", $birthDate = null, $cpf = null, $rg = null, $phoneNumber = null, $address = [], $id = null)
     {
         if (validateString($name)) {
             $this->name = $name;
@@ -43,6 +44,10 @@ class Customer
 
         if (validateStrictlyPositiveNumber($id)) {
             $this->id = (int)$id;
+        }
+
+        if ($address) {
+            $this->address = $address;
         }
     }
 

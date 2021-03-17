@@ -23,7 +23,7 @@ class CustomerStorage extends DatabaseStorage
     public function save(array $customer)
     {
         $this->db->table($this->schema);
-        $this->db->insert($customer);
+        return $this->db->insert($customer);
     }
 
     public function count(ListDTO $params)
@@ -65,24 +65,25 @@ class CustomerStorage extends DatabaseStorage
         $result = $this->db->get();
 
         if (count($result)) {
-            return new Customer(
+
+            $customerAddressStorage = new CustomerAddressStorage();
+            $addresses = $customerAddressStorage->getAllAddressByCustomerId($id);
+            $result['addresses'] = $addresses ? $addresses : [];
+
+            $customer = new Customer(
                 $result['name'],
                 $result['birth_date'],
                 $result['cpf'],
                 $result['rg'],
                 $result['phone_number'],
+                $result['addresses'],
                 $result['id']
             );
+
+            return $customer;
         }
 
         throw new Exception('Customer not found', 400);
-
-        // if ($result) {
-        //     $customerAddress = new CustomerAddress();
-        //     $addresses = $customerAddress->getAllAddressByCustomerId($id);
-        //     $result['addresses'] = $addresses ? $addresses : [];
-        // }
-
     }
 
     public function delete(int $id)

@@ -216,7 +216,7 @@ class Database implements IDatabase
 
     public function insert($dataInsert)
     {
-        $status = false;
+        $insertId = false;
         if ($this->table && is_array($dataInsert) && count($dataInsert)) {
             $collumns = [];
             $values = [];
@@ -239,7 +239,7 @@ class Database implements IDatabase
                 $statement->execute();
 
                 if ($statement->affected_rows) {
-                    $status = true;
+                    $insertId = $this->connection->insert_id;
                 }
 
                 $statement->close();
@@ -248,7 +248,7 @@ class Database implements IDatabase
             throw new Exception("Invalid data in method 'insert'", 500);
         }
         $this->cleanAfterOperation();
-        return $status;
+        return $insertId;
     }
 
     public function delete()
