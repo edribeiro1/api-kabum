@@ -32,6 +32,7 @@ function send($statusCode=200, $message=false, $data=false)
     }
 
     header("HTTP/1.1 $statusCode $statusTexts[$statusCode]");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS"); 
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Headers: Content-Type, Origin, X-Requested-With, Accept, Authorization');
     header('Content-Type: application/json');
